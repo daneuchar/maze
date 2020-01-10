@@ -1,57 +1,48 @@
 #!/usr/bin/env node
-
-
-var PF = require('pathfinding');
 var image = require('./image');
 var maze = require('./maze');
-const performance = require('perf_hooks').performance;
+const express = require('express')
+const fileUpload = require('express-fileupload');
+var path = require('path');
+const app = express()
+const port = 3000
 
-var filename = '4k';
-
-
-async function start() {
+app.use(fileUpload());
+app.use("/output", express.static(path.join(__dirname, 'output')));
+async function start(filename) {
   try {
-    let rawPixels = await image.toPixels('input/maze400.png');
+    let rawPixels = await image.toPixels('input/'+filename);
     col = rawPixels.shape[1];
     row = rawPixels.shape[0];
     pixels = maze.pixelArray(Array.from(rawPixels.data),4);
     let mazeArray = maze.mazeArray(pixels,col);
     let mazePath = maze.pathFinder(mazeArray);
-    image.mazeRender(mazePath,pixels,row,col,'123');
+    image.mazeRender(mazePath,pixels,row,col,filename);
     
   } catch (e) {
     console.log("error : "+e)
   }
 }
 
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname + '/index.html'));
+});
 
-  
-  // 
-  // createMaze(data,pixels.shape[0],pixels.shape[1]);
+app.post('/upload', function(req, res) {
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send('No files were uploaded.');
+  }
 
-/*
-    generate row 
-    [ 0,0,0,1,0,0,0,0,0,0]
+  let mazefile = req.files.mazefile;
+  var file = (mazefile.name).split('.');
+  var filename=file[0]+'_'+Date.now()+'.'+file[1];
+  mazefile.mv('input/'+filename, function(err) {
+    if (err)
+      return res.status(500).send(err);
+    start(filename);
+    res.send("<img src='output/"+filename+"' style='width:50%'/>");
 
-*/
-function createMaze(data,row,col){
+  });
+})
 
-
-
-   
-    // convert  2darray to 1d array 
-   // pix = [].concat(...data);
-   
-
-}
-
-//entry and exit points should not be on the same row and on any columns
-function getEntryExitPoint(maze){
-  var startx,endx;
-
-  startx = maze[0].indexOf(0);
-  endx = maze[maze.length-1].indexOf(0);
-  return {startx,endx};
-}
-
-start();
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))

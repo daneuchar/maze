@@ -18,7 +18,6 @@ var image = function() {
     }
 
     var mazeRender = function mazeRender(path,maze,col,row,filename){
-        console.log(row);
         path.forEach(item=>{
             index = item[0] + (item[1]*col);
             maze[index] = red;  
@@ -26,8 +25,8 @@ var image = function() {
 
         pix = maze.flat(1);
         fs.writeFileSync(
-        'output/'+filename+'.png',
-        Buffer.from(encoder(pix, [row, col], 'png'))
+        'output/'+filename,
+        Buffer.from(encoder(pix, [row, col], filename.split('.')[1]))
         )
         
     }

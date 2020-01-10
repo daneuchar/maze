@@ -13,6 +13,9 @@
   "author": "Zain Abideen / Daniel Euchar",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.6",
+    "formidable": "^1.2.1",
     "get-pixels": "^3.3.2",
     "image-encode": "^1.3.0",
     "pathfinding": "^0.4.18"

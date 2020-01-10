@@ -1,7 +1,7 @@
 var white = [255,255,255,255];
 
 var pathFinding = require('pathfinding');
-
+const performance = require('perf_hooks').performance;
 var maze = function(){
     var pixelArray = function pixelArray(array, size) {
         let resultArray = [];
@@ -32,10 +32,14 @@ var maze = function(){
     }
 
     var pathFinder = function pathFinder(maze){
+        
         var points = entryExitPoint(maze);
         var grid = new pathFinding.Grid(maze);
         var finder = new pathFinding.AStarFinder();
+        startTime = performance.now();
         var path = finder.findPath(points.startx,0,points.endx,(maze.length-1),grid);
+        endTime = performance.now();
+        console.log('Found path in : '+(endTime-startTime)+' ms')
         return path;
     }
 
